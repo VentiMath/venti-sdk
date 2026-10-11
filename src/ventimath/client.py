@@ -294,7 +294,7 @@ class VentiMathClient:
         public: bool | None = None,
         vocabulary: Iterable[Mapping[str, str]] | None = None,
     ) -> dict[str, Any]:
-        """Update only specified metadata; vocabulary replaces the existing list."""
+        """Update specified metadata; vocabulary replaces the list, publication is permanent."""
         body: dict[str, Any] = {}
         if name is not None:
             body["name"] = name

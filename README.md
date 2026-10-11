@@ -67,7 +67,8 @@ The ordinary `VentiMathClient()` constructor remains anonymous even if a token
 environment variable exists.
 
 Sets are **public by default**. Pass `public=False` at creation to keep a set
-private to your account, as this import example does:
+private to your account. Publishing a private set is permanent; public sets cannot
+be made private. This import example creates a private set:
 
 ```python
 from pathlib import Path
