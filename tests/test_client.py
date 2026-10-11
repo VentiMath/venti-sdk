@@ -195,6 +195,14 @@ class ClientTests(unittest.TestCase):
             self.client.update_tag_set("123_amc", public="false")
         self.urlopen.assert_not_called()
 
+    def test_update_refuses_private_visibility_without_sending_other_changes(self):
+        self.reply({"set": {"id": "123_amc"}})
+        for public in (False, 0, 1, "false"):
+            with self.subTest(public=public):
+                with self.assertRaisesRegex(ValueError, "public must be True"):
+                    self.client.update_tag_set("123_amc", name="Renamed", public=public)
+        self.urlopen.assert_not_called()
+
     def test_pagination_follows_empty_pages_and_preserves_problem_classification(self):
         problem = {
             "id": "p2",

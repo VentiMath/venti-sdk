@@ -8,7 +8,7 @@ import os
 from collections.abc import Iterable, Mapping
 from http.client import HTTPException
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlencode, urlsplit
 from urllib.request import HTTPRedirectHandler, Request, build_opener
@@ -291,17 +291,20 @@ class VentiMathClient:
         set_id: str,
         *,
         name: str | None = None,
-        public: bool | None = None,
+        public: Literal[True] | None = None,
         vocabulary: Iterable[Mapping[str, str]] | None = None,
     ) -> dict[str, Any]:
-        """Update specified metadata; vocabulary replaces the list, publication is permanent."""
+        """Update metadata or publish with public=True; publication is permanent.
+
+        Vocabulary replaces the list. Private visibility is only chosen at creation.
+        """
         body: dict[str, Any] = {}
         if name is not None:
             body["name"] = name
         if public is not None:
-            if type(public) is not bool:
-                raise ValueError("public must be a boolean")
-            body["visibility"] = "public" if public else "private"
+            if public is not True:
+                raise ValueError("public must be True to publish; choose private at creation")
+            body["visibility"] = "public"
         if vocabulary is not None:
             body["vocabulary"] = list(vocabulary)
         if not body:
