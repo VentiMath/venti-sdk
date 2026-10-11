@@ -66,6 +66,9 @@ reads `VENTI_API_KEY` and optionally `VENTI_API_URL`. Neither stores credentials
 The ordinary `VentiMathClient()` constructor remains anonymous even if a token
 environment variable exists.
 
+Sets are **public by default**. Pass `public=False` at creation to keep a set
+private to your account, as this import example does:
+
 ```python
 from pathlib import Path
 from ventimath import (
@@ -79,6 +82,7 @@ vocabulary = load_vocabulary_csv("skill-lists/skills-merged.csv")
 created = client.create_tag_set(
     "amc-skills",
     "My AMC skill classifications",
+    public=False,
     vocabulary=vocabulary,
 )
 set_id = created["set"]["id"]
@@ -97,14 +101,6 @@ report = client.import_classifications(set_id, records)
 print("Imported:", report["imported"], "unchanged:", report["unchanged"])
 for rejected in report["rejected"]:
     print(rejected)
-```
-
-Sets are **private by default**. Publishing is an explicit metadata update:
-
-```python
-client.update_tag_set(set_id, public=True)
-# Return it to private later:
-# client.update_tag_set(set_id, public=False)
 ```
 
 Individual records use `{problemId, result, model, reasoningEffort}`. Combined

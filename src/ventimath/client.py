@@ -271,10 +271,10 @@ class VentiMathClient:
         slug: str,
         name: str,
         *,
-        public: bool = False,
+        public: bool = True,
         vocabulary: Iterable[Mapping[str, str]] | None = None,
     ) -> dict[str, Any]:
-        """Create a private set on the token owner's profile unless public=True."""
+        """Create a public set on the token owner's profile; use public=False for private."""
         if type(public) is not bool:
             raise ValueError("public must be a boolean")
         body: dict[str, Any] = {

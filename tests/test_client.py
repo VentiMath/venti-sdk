@@ -147,7 +147,8 @@ class ClientTests(unittest.TestCase):
                     self.assertEqual(len(requests), 1)
                     self.assertEqual(requests[0].get_method(), method)
                     self.assertEqual(urlsplit(requests[0].full_url).hostname, "api.example.test")
-    def test_create_is_private_and_update_publishes_only_when_explicit(self):
+
+    def test_create_is_public_by_default_and_update_changes_only_requested_metadata(self):
         vocabulary = [{"skill": "Casework", "category": "Counting", "description": "Cases"}]
         self.reply({"set": {"id": "123_amc"}})
         self.client.create_tag_set("amc", "My AMC tags", vocabulary=vocabulary)
@@ -157,7 +158,7 @@ class ClientTests(unittest.TestCase):
             {
                 "slug": "amc",
                 "name": "My AMC tags",
-                "visibility": "private",
+                "visibility": "public",
                 "vocabulary": vocabulary,
             },
         )
@@ -170,6 +171,19 @@ class ClientTests(unittest.TestCase):
         self.reply({"set": {"id": "123_amc"}})
         self.client.update_tag_set("123_amc", name="Renamed")
         self.assertEqual(self.body(), {"name": "Renamed"})
+
+    def test_explicit_private_set_is_private_from_the_first_and_only_request(self):
+        payload = {"set": {"id": "123_amc", "visibility": "private"}}
+        self.reply(payload)
+        result = self.client.create_tag_set("amc", "My AMC tags", public=False)
+        self.assertEqual(result, payload)
+        self.assertEqual(self.urlopen.call_count, 1)
+        self.assertEqual(self.request().method, "POST")
+        self.assertEqual(self.request().full_url, "https://api.example.test/problemTags/sets")
+        self.assertEqual(
+            self.body(),
+            {"slug": "amc", "name": "My AMC tags", "visibility": "private"},
+        )
 
     def test_writes_require_own_token_and_boolean_publication_choice(self):
         anonymous = VentiMathClient()
